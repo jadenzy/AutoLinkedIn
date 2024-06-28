@@ -12,8 +12,8 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 SAMPLE_SPREADSHEET_ID = "1wPSluF2x99HR2ITwUYvRRn6-LRP2_4eUGMsR-nIb2CU"
 SAMPLE_RANGE_NAME = "Sheet1!B:C"
 
-ID = "jadenyang65809@gmail.com"
-PASSWORD = "20030726Abc@"
+ID = ""
+PASSWORD = ""
 
 def main():
     creds = None
