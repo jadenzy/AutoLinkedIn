@@ -12,8 +12,8 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 SAMPLE_SPREADSHEET_ID = "1wPSluF2x99HR2ITwUYvRRn6-LRP2_4eUGMsR-nIb2CU"
 SAMPLE_RANGE_NAME = "Sheet1!B:C"
 
-ID = ""
-PASSWORD = ""
+ID = "jadenyang65809@gmail.com"
+PASSWORD = "20030726Abc@"
 
 def main():
     creds = None
@@ -64,18 +64,17 @@ from selenium import webdriver
 import time
 from time import sleep
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager #This one need to be instlled, no included in selenium 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
-
+from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException
+from selenium.webdriver.common.keys import Keys 
 def connect(data):
     s = Service()
     setting = Options() 
     setting.add_argument('--incognito')
-    setting.add_experimental_option('excludeSwitches', ['enable-logging', "enable-automation"])
+    setting.add_experimental_option('excludeSwitches', ["enable-automation"])
     setting.add_experimental_option("detach", True)
     #setting.add_argument('--headless') # Uncomment to run in headless mode
     driver = webdriver.Chrome(service = s, options = setting)
@@ -89,14 +88,27 @@ def connect(data):
     password.send_keys(PASSWORD)      
     # Getting the tag for submit button                     
     driver.find_element(By.XPATH, '//*[@id="organic-div"]/form/div[3]/button').click() 
-    driver.get("https://www.linkedin.com/in/vijitdua/")
     
-    try:
-        driver.find_element(By.XPATH, "//button[.//span[text()='Connect']]") or driver.find_element(By.XPATH, "//button[.//span[text()='Accept']]")
-        
-    except NoSuchElementException:
-        print("no")
-    driver.close()
-    
+    def click_button(button_xpath):
+            try:
+                button = wait.until(EC.element_to_be_clickable((By.XPATH, button_xpath)))
+                driver.execute_script("arguments[0].scrollIntoView(true);", button)
+                button.click()
+                return True
+            except (TimeoutException, ElementClickInterceptedException):
+                return False
+                
+    notFind = 0
+    for name, url in data.items():
+        driver.get(url)
+        wait = WebDriverWait(driver, 10)
+        # Try to click the 'Connect' button, if it fails try the 'Accept' button
+        if not click_button("//button[.//span[text()='Connect']]"):
+            if not click_button("//button[.//span[text()='Accept']]"):
+                notFind += 1 
+    print(f"Total number of people found: {len(data)}, connect or accept to: {len(data) - notFind}")
+
 if __name__ == "__main__":
-    print(main())
+    data = main()
+    connect(data)
+    
